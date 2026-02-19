@@ -1,27 +1,28 @@
-require('dotenv').config();   // Always keep this at top
+require('dotenv').config();
 
-const mongoose = require('mongoose');
 const express = require('express');
-const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const router = require('./Routes/route');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
+// ✅ MIDDLEWARE FIRST
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ ROUTES
 app.use(router);
 app.use('/uploads', express.static('uploads'));
 
-
-// Use .env variable instead of hardcoding
+// ✅ DB
 mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
 
+// ✅ SERVER
 app.listen(port, () => {
-	console.log(`Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
-
