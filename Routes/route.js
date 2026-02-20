@@ -4,13 +4,14 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-// ✅ CLEAN multer usage
+// ✅ THIS IS THE ROUTE YOUR FRONTEND CALLS
 router.post(
-    '/generate-qr',
-    upload.single('image'),
-    controller.generateQR
+  '/profile',
+  upload.single('image'),
+  controller.generateQR
 );
 
+// (optional – keep if you need CRUD later)
 router.get('/profile/:id', controller.getProfile);
 router.put('/profile/:id', controller.updateProfile);
 router.delete('/profile/:id', controller.deleteProfile);
