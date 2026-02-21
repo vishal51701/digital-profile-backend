@@ -6,14 +6,14 @@ const router = express.Router();
 
 // ✅ THIS IS THE ROUTE YOUR FRONTEND CALLS
 router.post(
-  '/profile',
+  '/Profile',
   upload.single('image'),
   controller.generateQR
 );
 
 // (optional – keep if you need CRUD later)
-router.get('/profile/:id', controller.getProfile);
-router.put('/profile/:id', controller.updateProfile);
-router.delete('/profile/:id', controller.deleteProfile);
+router.get('/Profile/:id', controller.getProfile);
+router.put('/Profile/:id', controller.updateProfile);
+router.delete('/Profile/:id', controller.deleteProfile);
 
 module.exports = router;

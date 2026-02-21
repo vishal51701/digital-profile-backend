@@ -65,8 +65,7 @@ for (let i = 0; i < contactTitle.length; i++) {
 
         const savedProfile = await newProfile.save();
 
-        const profileUrl = `http://localhost:3000/profile/${savedProfile._id}`;
-        const qrCodeBuffer = await service.generateQRCode(profileUrl);
+const profileUrl = `https://digital-profile-backend-production-aa53.up.railway.app/profile/${savedProfile._id}`;        const qrCodeBuffer = await service.generateQRCode(profileUrl);
 
         res.json({ qrCode: qrCodeBuffer.toString("base64") });
 //         res.json({
