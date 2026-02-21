@@ -8,78 +8,68 @@
 const service = require("../service");
 const Profile = require("../Models/Profile");
 
-// CREATE PROFILE + GENERATE QR
 exports.generateQR = async (req, res) => {
-    try {
-        console.log(req.body); // 🔥 keep this while testing
+  try {
+    const {
+      name,
+      about,
+      company,
+      website,
+      phone,
+      email,
+      location,
+      contactTitle,
+      contactValue,
+      socialTitle,
+      socialLink
+    } = req.body;
 
-        const {
-            name,
-            about,
-            company,
-            website,
-            phone,
-            email,
-            location,
-             contactTitle = [],
-             contactValue = [],
-            socialTitle = [],
-            socialLink = []
-        } = req.body;
+    // 🔒 normalize FormData arrays (Vercel-safe)
+    const normalize = (v) => Array.isArray(v) ? v : v ? [v] : [];
 
-        const formattedSocialLinks = [];
+    const safeSocialTitle = normalize(socialTitle);
+    const safeSocialLink = normalize(socialLink);
+    const safeContactTitle = normalize(contactTitle);
+    const safeContactValue = normalize(contactValue);
 
-        for (let i = 0; i < socialTitle.length; i++) {
-            if (socialTitle[i] && socialLink[i]) {
-                formattedSocialLinks.push({
-                    title: socialTitle[i],
-                    url: socialLink[i]
-                });
-            }
-        }
+    const formattedSocialLinks = safeSocialTitle.map((t, i) => ({
+      title: t,
+      url: safeSocialLink[i]
+    })).filter(v => v.title && v.url);
 
-        const formattedContacts = [];
+    const formattedContacts = safeContactTitle.map((t, i) => ({
+      title: t,
+      value: safeContactValue[i]
+    })).filter(v => v.title && v.value);
 
-for (let i = 0; i < contactTitle.length; i++) {
-    if (contactTitle[i] && contactValue[i]) {
-        formattedContacts.push({
-            title: contactTitle[i],
-            value: contactValue[i]
-        });
-    }
-}
+    const newProfile = new Profile({
+      name,
+      about,
+      company,
+      website,
+      phone,
+      email,
+      location,
+      contacts: formattedContacts,
+      socialLinks: formattedSocialLinks,
+      image: null // ❌ disable multer on Vercel
+    });
 
+    const savedProfile = await newProfile.save();
 
-        const newProfile = new Profile({
-            name,
-            about,
-            company,
-            website,
-            phone,
-            email,
-            location,
-            contacts: formattedContacts, 
-            socialLinks: formattedSocialLinks,
-            image: req.file ? req.file.filename : null
-        });
+    const profileUrl = `${process.env.BASE_URL}/profile/${savedProfile._id}`;
 
-        const savedProfile = await newProfile.save();
+    const qrCodeBuffer = await service.generateQRCode(profileUrl);
 
-const profileUrl = `https://digital-profile-backend-production-aa53.up.railway.app/profile/${savedProfile._id}`;        const qrCodeBuffer = await service.generateQRCode(profileUrl);
+    res.status(200).json({
+      qrCode: qrCodeBuffer.toString("base64")
+    });
 
-        res.json({ qrCode: qrCodeBuffer.toString("base64") });
-//         res.json({
-//   profileId: savedProfile._id
-// });
-
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+  } catch (err) {
+    console.error("QR ERROR:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
-
-
 
 
 // VIEW PROFILE PAGE
