@@ -5,12 +5,12 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 // ✅ THIS IS THE ROUTE YOUR FRONTEND CALLS
-router.post(
-  '/Profile',
-  upload.single('image'),
-  controller.generateQR
-);
-
+// router.post(
+//   '/Profile',
+//   upload.single('image'),
+//   controller.generateQR
+// );
+router.post('/profile', controller.generateQR);
 // (optional – keep if you need CRUD later)
 router.get('/Profile/:id', controller.getProfile);
 router.put('/Profile/:id', controller.updateProfile);
